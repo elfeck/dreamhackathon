@@ -1,36 +1,101 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Entity : MonoBehaviour
 {
-    public float reach;
-    [HideInInspector] public float bias = 0f;
+    static private List<HashSet<Entity>> _grid;
+    static public List<Entity> allEntities = new List<Entity>();
 
-    [HideInInspector] public Movement movement;
+    public float bias = 0f;
+    private int _currGridIndex = -1;
+    public float cellInfluenceFactor = 0.2f;
+
+    public float reach;
+    [HideInInspector]
+    public Movement movement;
 
     void Awake()
-    { 
+    {
         movement = GetComponent<Movement>();
 
         bias = Random.Range(-1f, 1f);
 
-        //"Random spawn"
-        Vector3 _tmp = new Vector3();
-        _tmp.x = Random.Range((GameObject.Find("obj_Ground").transform.localScale.x / 2) * -1, (GameObject.Find("obj_Ground").transform.localScale.x / 2));
-        _tmp.z = Random.Range((GameObject.Find("obj_Ground").transform.localScale.z / 2) * -1, (GameObject.Find("obj_Ground").transform.localScale.z / 2));
-        transform.position = _tmp;
+        allEntities.Add(this);
     }
 
-	public void applyBias(float change)
-	{
-		bias += change;
-		bias = Mathf.Clamp(bias, -1f, 1f);
-	}
+    void OnDestroy()
+    {
+        allEntities.Remove(this);
+    }
 
-	void Update()
-	{
-		renderer.material.color = Color.Lerp(Color.red, Color.blue, Mathf.Clamp01((bias + 1f) / 2f));
-	}
+    IEnumerator Start()
+    {
+        if (_grid == null)
+        {
+            _grid = new List<HashSet<Entity>>(2048);
+            var res = GameSession.inst.getGridResolution();
+            res *= res;
+            for (int i = 0; i < res; ++i)
+                _grid.Add(new HashSet<Entity>());
+        }
+
+        //========================================//
+
+        yield return new WaitForSeconds(Random.Range(0f, 0.5f));
+
+        _currGridIndex = getGridIndex();
+        _grid[_currGridIndex].Add(this);
+
+        float interval = 0.25f;
+        while (true)
+        {
+            float cellBias = 0f;
+            foreach (var e in _grid[_currGridIndex])
+                cellBias += e.bias;
+
+            if (cellBias * Mathf.Sign(bias) < -4f)
+            {
+                die();
+                yield break;
+            }
+
+            applyBias(interval * cellBias * cellInfluenceFactor);
+
+            //update grid position
+            var index = getGridIndex();
+            if (_currGridIndex != index)
+            {
+                _grid[_currGridIndex].Remove(this);
+                _currGridIndex = index;
+                _grid[_currGridIndex].Add(this);
+            }
+
+            yield return new WaitForSeconds(interval);
+        }
+    }
+
+    void die()
+    {
+        _grid[_currGridIndex].Remove(this);
+        Destroy(gameObject);
+    }
+
+    public void applyBias(float change)
+    {
+        bias += change;
+        bias = Mathf.Clamp(bias, -1f, 1f);
+    }
+
+    void Update()
+    {
+        renderer.material.color = Color.Lerp(Color.red, Color.blue, Mathf.Clamp01((bias + 1f) / 2f));
+    }
+
+    int getGridIndex()
+    {
+        return GameSession.inst.getGridIndex(transform.position);
+    }
 
     public void InteractWithTarget()
     {
@@ -39,8 +104,8 @@ public class Entity : MonoBehaviour
             //Do good
         }
 
-        else 
-        { 
+        else
+        {
             //Do evil
         }
     }

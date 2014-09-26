@@ -1,102 +1,105 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class Movement : MonoBehaviour {
 
-    public float speed;
-    bool follow;
-    bool walk;
-    bool walkAround;
+	public float speed;
+	bool follow;
+	bool walk;
+	bool walkAround = true;
 
-    static GameObject ground;
-    Entity thisEntity;
-    Entity targetEntity;
-    Vector3 targetPos;
+	static GameObject ground;
+	Entity thisEntity;
+	Entity targetEntity;
+	Vector3 targetPos;
 
-    void Awake()
-    {
-        thisEntity = GetComponent<Entity>();
-        ground = GameObject.Find("obj_Ground");
-        speed = speed / 10;
-    }
-
-	void Start () 
-    {
-        WalkToRandomPos();
-        StartCoroutine(CheckForReach(0.3f));
+	void Awake()
+	{
+		thisEntity = GetComponent<Entity>();
+		ground = GameObject.Find("obj_Ground");
+		speed = speed / 10;
 	}
 
-    void Update()
-    {
-        //"Walk"
-        if (walk && targetPos != transform.position) 
-            transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * speed);
+	void Start () 
+	{
+		WalkToRandomPos();
+		StartCoroutine(CheckForReach(0.3f));
+	}
 
-        //"Seamless map"
-        CheckForBorder();
-    }
+	void Update()
+	{
+		//"Walk"
+		if (walk && targetPos != transform.position)
+			transform.position += speed * Time.deltaTime * (targetPos - transform.position).normalized;
 
-    void OnReach()
-    {
-        if (walkAround) WalkToRandomPos();
+		//"Seamless map"
+		CheckForBorder();
+	}
 
-        else
-        {
-            walk = false;
-            follow = false;
+	void OnReach()
+	{
+		if (walkAround) WalkToRandomPos();
 
-            if (targetEntity)
-            {
-                targetEntity.movement.walk = false;
-                targetEntity.InteractWithTarget();
+		else
+		{
+			walk = false;
+			follow = false;
 
-                targetEntity = null;
-            }
-        }
-    }
+			if (targetEntity)
+			{
+				targetEntity.movement.walk = false;
+				targetEntity.InteractWithTarget();
 
-    void CheckForBorder()
-    {
-        if (transform.position.x > (ground.transform.localScale.x / 2) || transform.position.x < ((ground.transform.localScale.x / 2) * -1))
-        {
-            transform.position = new Vector3(transform.position.x * -1, transform.position.y, transform.position.z);
-            targetPos.x *= -1;
-        }
+				targetEntity = null;
+			}
+		}
+	}
 
-        if (transform.position.z > (ground.transform.localScale.z / 2) || transform.position.z < ((ground.transform.localScale.z / 2) * -1))
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z * -1);
-            targetPos.z *= -1;
-        }
-    }
+	void CheckForBorder()
+	{
+		if (transform.position.x > (ground.transform.localScale.x / 2) || transform.position.x < (-(ground.transform.localScale.x / 2)))
+		{
+			transform.position = new Vector3(transform.position.x * -1, transform.position.y, transform.position.z);
 
-    void WalkToRandomPos()
-    {
-        targetPos = new Vector3(transform.position.x + Random.Range(-10, 10), transform.position.y, transform.position.z + Random.Range(-10, 10));
-        
-        walk = true;
-    }
 
-    public void StartFollowing(Entity _entity)
-    {
-        targetEntity = _entity;
+			targetPos.x -= Mathf.Sign(transform.position.x) * ground.transform.localScale.x;
+		}
 
-        follow = true;
-        walk = true;
-    }
+		if (transform.position.z > (ground.transform.localScale.z / 2) || transform.position.z < ((ground.transform.localScale.z / 2) * -1))
+		{
+			transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z * -1);
 
-    IEnumerator CheckForReach(float _updateFreq)
-    {
-        for (; ; )
-        {
-            if(follow) targetPos = targetEntity.transform.position;
+			targetPos.z -= Mathf.Sign(transform.position.z) * ground.transform.localScale.z;
+		}
+	}
 
-            if (Vector3.Distance(transform.position, targetPos) <= thisEntity.reach)
-            {
-                OnReach();
-            }
+	void WalkToRandomPos()
+	{
+		targetPos = new Vector3(transform.position.x + Random.Range(-10, 10), transform.position.y, transform.position.z + Random.Range(-10, 10));
+		
+		walk = true;
+	}
 
-            yield return new WaitForSeconds(_updateFreq);
-        }
-    }
+	public void StartFollowing(Entity _entity)
+	{
+		targetEntity = _entity;
+
+		follow = true;
+		walk = true;
+	}
+
+	IEnumerator CheckForReach(float _updateFreq)
+	{
+		for (; ; )
+		{
+			if(follow) targetPos = targetEntity.transform.position;
+
+			if (Vector3.Distance(transform.position, targetPos) <= thisEntity.reach)
+			{
+				OnReach();
+			}
+
+			yield return new WaitForSeconds(_updateFreq);
+		}
+	}
 }

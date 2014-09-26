@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
 
 		//========================================//
 
-		var entities = GameSession.inst.getEntities();
+		var entities = Entity.allEntities;
 
 		for(int i = 0; i < 2; ++i)
 		{
