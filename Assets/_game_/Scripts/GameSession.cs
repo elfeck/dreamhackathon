@@ -9,6 +9,9 @@ public class GameSession : SASSingleton<GameSession>
 
 	public float gridCellSize = 3f;
 	public Transform ground;
+	public Transform homeZoneRed;
+	public Transform homeZoneBlue;
+	public GameObject gameOverScreen;
 	
 	private int gridResolution;
 
@@ -18,8 +21,13 @@ public class GameSession : SASSingleton<GameSession>
 	{
 		base.Awake();
 
-
 		gridResolution = Mathf.CeilToInt(Mathf.Max(ground.localScale.x, ground.localScale.z) / gridCellSize);
+		gameOverScreen.SetActive(false);
+	}
+
+	void OnEnable()
+	{
+		InvokeRepeating(slowUpdate, 0.25f);
 	}
 
 	IEnumerator Start()
@@ -60,4 +68,28 @@ public class GameSession : SASSingleton<GameSession>
 
 		return gridResolution * y + x;
 	}
+
+	//---------------------------------------------------------------------------//
+
+	void slowUpdate()
+	{
+		//check if an entity is in the final region of the opposing party
+		foreach(var e in Entity.allEntities)
+		{
+			if((e.bias < 0f && isInZone(homeZoneBlue, e.transform.position))
+			 || (e.bias > 0f && isInZone(homeZoneRed, e.transform.position)))
+			{
+				//LOST
+				gameOverScreen.SetActive(true);
+			}
+		}
+	}
+
+	bool isInZone(Transform zone, Vector3 pos)
+	{
+		pos = zone.InverseTransformPoint(pos);
+		return (zone.localScale.x * 0.5f > Mathf.Abs(pos.x)) && (zone.localScale.z * 0.5f > Mathf.Abs(pos.z));
+	}
+
+	//---------------------------------------------------------------------------//
 }

@@ -60,7 +60,7 @@ public class Entity : MonoBehaviour
 				yield break;
 			}
 
-			applyBias(interval * cellBias * cellInfluenceFactor);
+			//applyBias(interval * cellBias * cellInfluenceFactor);
 
 			//update grid position
 			var index = getGridIndex();
@@ -99,14 +99,6 @@ public class Entity : MonoBehaviour
 
 	public void InteractWithTarget()
 	{
-		if(Random.Range(-10, 10) > 0)
-		{
-			//Do good
-		}
 
-		else
-		{
-			//Do evil
-		}
 	}
 }
