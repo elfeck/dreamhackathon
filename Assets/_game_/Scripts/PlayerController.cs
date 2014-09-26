@@ -9,18 +9,7 @@ public enum PlayerPowers
 
 public class PlayerController : MonoBehaviour
 {
-	private IEyeXDataProvider<EyeXGazePoint> _datastream;
 	private Vector3[] actionPos = new Vector3[2];
-
-	void Start()
-	{
-		if(EyeXHost.GetInstance() != null && EyeXHost.GetInstance().IsInitialized)
-		{
-			//init eyeX
-			_datastream = EyeXHost.GetInstance().GetGazePointDataProvider(Tobii.EyeX.Framework.GazePointDataMode.LightlyFiltered);
-			_datastream.Start();
-		}
-	}
 
 	void Update()
 	{
@@ -29,9 +18,9 @@ public class PlayerController : MonoBehaviour
 
 		//get gaze point form datastreem (only if info valid and eyeX there!)
 		actionPos[1] = Vector3.zero;
-		if(_datastream != null && _datastream.Last.IsValid && _datastream.Last.IsWithinScreenBounds)
+		if(EyeXController.inst.isDataAvailable())
 		{
-			var tmp = _datastream.Last.Screen;
+			var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
 			actionPos[1] = new Vector3(tmp.x, tmp.y, 0f);
 		}
 		else
