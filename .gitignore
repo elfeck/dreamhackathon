@@ -2,4 +2,5 @@
 UnityVS.Dreamhackathon2014.sln.DotSettings
 *.sln
 *.csproj
+/obj
 /Temp
