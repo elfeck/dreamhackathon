@@ -9,6 +9,8 @@ public enum PlayerPowers
 
 public class PlayerController : MonoBehaviour
 {
+	public float conversionSpeed = 1f;
+
 	private Vector3[] actionPos = new Vector3[2];
 
 	void Update()
