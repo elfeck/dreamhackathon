@@ -81,15 +81,10 @@ public class Entity : MonoBehaviour
 		Destroy(gameObject);
 	}
 
-	public void applyBias(float change, bool god = false)
+	public void applyBias(float change)
 	{
 		bias += change;
 		bias = Mathf.Clamp(bias, -1f, 1f);
-
-		if(god)
-		{
-
-		}
 	}
 
 	void Update()
