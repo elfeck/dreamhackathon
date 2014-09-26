@@ -1,0 +1,20 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+static public class Config
+{
+	//defines different update periods on server-side
+	public const float defaultUpdateFrequency = 0.2f;
+	public const float fastUpdateFrequency = 0.05f;
+	
+	//if this time passes after the last net-update received (rigid-bodies), then the object is
+	//assumed to be sleeping.
+	public const float sleepDelayAfterLastNetUpdate = 0.8f;
+	//it is tried to reach the sleeping state via recursive filters for 
+	//this time specified here. Afterwards a snap is performed.
+	public const float smoothCorrectionDurationForSleepStates = 2.5f;
+	//determines how fast the correction to the correct position should be performed after an RB 
+	//went to sleep on the server [this are percent of the interpolation done per second!]
+	public const float finalRBCorrectionRecursiveFactor = 6f;
+}

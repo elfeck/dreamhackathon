@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 92e6c7d4966686340a580c3d1cc70143
+ShaderImporter:
+  defaultTextures:
+  - _MainTex: {instanceID: 0}
+  - _BumpMap: {instanceID: 0}
+  - _BlendMap: {instanceID: 0}
+  - _BlendBumpMap: {instanceID: 0}
+  - _OverlayMap: {fileID: 2800000, guid: baef0ec9b421ff44f971945f3365cbef, type: 3}
+  userData: 
