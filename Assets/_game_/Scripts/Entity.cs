@@ -12,10 +12,11 @@ public class Entity : MonoBehaviour
 	public float cellInfluenceFactor = 0.2f;
 
 	public float reach;
-	[HideInInspector] public Movement movement;
+	[HideInInspector]
+	public Movement movement;
 
 	void Awake()
-	{ 
+	{
 		movement = GetComponent<Movement>();
 
 		bias = Mathf.Sign(Random.Range(-1f, 1f));
@@ -52,13 +53,13 @@ public class Entity : MonoBehaviour
 			float cellBias = 0f;
 			foreach(var e in _grid[_currGridIndex])
 				cellBias += e.bias;
-			
+
 			if(cellBias * Mathf.Sign(bias) < -1f)
 			{
 				die();
 				yield break;
 			}
-			
+
 			applyBias(interval * cellBias * cellInfluenceFactor);
 
 			//update grid position
@@ -87,7 +88,7 @@ public class Entity : MonoBehaviour
 
 		if(god)
 		{
-			
+
 		}
 	}
 
@@ -103,13 +104,13 @@ public class Entity : MonoBehaviour
 
 	public void InteractWithTarget()
 	{
-		if (Random.Range(-10, 10) > 0)
+		if(Random.Range(-10, 10) > 0)
 		{
 			//Do good
 		}
 
-		else 
-		{ 
+		else
+		{
 			//Do evil
 		}
 	}
