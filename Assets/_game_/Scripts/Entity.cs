@@ -12,17 +12,14 @@ public class Entity : MonoBehaviour
     { 
         movement = GetComponent<Movement>();
 
+        bias = Random.Range(-1f, 1f);
+
         //"Random spawn"
         Vector3 _tmp = new Vector3();
         _tmp.x = Random.Range((GameObject.Find("obj_Ground").transform.localScale.x / 2) * -1, (GameObject.Find("obj_Ground").transform.localScale.x / 2));
         _tmp.z = Random.Range((GameObject.Find("obj_Ground").transform.localScale.z / 2) * -1, (GameObject.Find("obj_Ground").transform.localScale.z / 2));
         transform.position = _tmp;
     }
-
-	void Awake()
-	{
-		bias = Random.Range(-1f, 1f);
-	}
 
 	public void applyBias(float change)
 	{
