@@ -18,7 +18,7 @@ public class Entity : MonoBehaviour
 	{ 
 		movement = GetComponent<Movement>();
 
-		bias = Random.Range(-1f, 1f);
+		bias = Mathf.Sign(Random.Range(-1f, 1f));
 
 		allEntities.Add(this);
 	}
@@ -53,7 +53,7 @@ public class Entity : MonoBehaviour
 			foreach(var e in _grid[_currGridIndex])
 				cellBias += e.bias;
 			
-			if(cellBias * Mathf.Sign(bias) < -4f)
+			if(cellBias * Mathf.Sign(bias) < -1f)
 			{
 				die();
 				yield break;
@@ -80,10 +80,15 @@ public class Entity : MonoBehaviour
 		Destroy(gameObject);
 	}
 
-	public void applyBias(float change)
+	public void applyBias(float change, bool god = false)
 	{
 		bias += change;
 		bias = Mathf.Clamp(bias, -1f, 1f);
+
+		if(god)
+		{
+			
+		}
 	}
 
 	void Update()

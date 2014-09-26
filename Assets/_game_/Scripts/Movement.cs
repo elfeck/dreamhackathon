@@ -7,6 +7,7 @@ public class Movement : MonoBehaviour {
 	bool follow;
 	bool walk;
 	bool walkAround = true;
+	bool formationWalk = true;
 
 	static GameObject ground;
 	Entity thisEntity;
@@ -22,7 +23,8 @@ public class Movement : MonoBehaviour {
 
 	void Start () 
 	{
-		WalkToRandomPos();
+		//WalkToRandomPos();
+		WalkToOtherSide();
 		StartCoroutine(CheckForReach(0.3f));
 	}
 
@@ -73,11 +75,21 @@ public class Movement : MonoBehaviour {
 		}
 	}
 
-	void WalkToRandomPos()
+	void WalkToRandomPos(float radius = 10f)
 	{
-		targetPos = new Vector3(transform.position.x + Random.Range(-10, 10), transform.position.y, transform.position.z + Random.Range(-10, 10));
+		targetPos = new Vector3(transform.position.x + Random.Range(-radius, radius), transform.position.y, transform.position.z + Random.Range(-radius, radius));
 		
 		walk = true;
+		formationWalk = false;
+	}
+
+	void WalkToOtherSide()
+	{
+		targetPos = transform.position;
+		targetPos.x = -Mathf.Sign(transform.position.x) * ground.transform.localScale.x * Random.Range(0.3f, 0.5f);
+
+		walk = true;
+		formationWalk = true;
 	}
 
 	public void StartFollowing(Entity _entity)

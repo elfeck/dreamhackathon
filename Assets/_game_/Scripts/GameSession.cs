@@ -21,8 +21,12 @@ public class GameSession : SASSingleton<GameSession>
 		for(int i = 0; i < totalCount; ++i)
 		{
 			var go = Instantiate(entity) as GameObject;
+			var e = go.GetComponent<Entity>();
 
-			go.transform.position = HelperFunctions.RandomVector3InsideUnitCircle() * 15f;
+			var pos = go.transform.position;
+			pos.x = Mathf.Sign(e.bias) * ground.localScale.x * Random.Range(0.25f, 0.5f);
+			pos.z = Random.Range(-1f, 1f) * ground.localScale.z * 0.5f;
+			go.transform.position = pos;
 
 			go.GetComponent<Entity>();
 		}
