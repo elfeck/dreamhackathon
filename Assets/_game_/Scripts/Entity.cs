@@ -5,13 +5,27 @@ using System.Collections.Generic;
 public class Entity : MonoBehaviour
 {
 	static private List<HashSet<Entity>> _grid;
+	static public List<Entity> allEntities = new List<Entity>();
 
 	public float bias = 0f;
 	private int _currGridIndex = -1;
+	public float cellInfluenceFactor = 0.2f;
+
+	public float reach;
+	[HideInInspector] public Movement movement;
 
 	void Awake()
-	{
+	{ 
+		movement = GetComponent<Movement>();
+
 		bias = Random.Range(-1f, 1f);
+
+		allEntities.Add(this);
+	}
+
+	void OnDestroy()
+	{
+		allEntities.Remove(this);
 	}
 
 	IEnumerator Start()
@@ -27,11 +41,26 @@ public class Entity : MonoBehaviour
 
 		//========================================//
 
+		yield return new WaitForSeconds(Random.Range(0f, 0.5f));
+
 		_currGridIndex = getGridIndex();
 		_grid[_currGridIndex].Add(this);
 
+		float interval = 0.25f;
 		while(true)
 		{
+			float cellBias = 0f;
+			foreach(var e in _grid[_currGridIndex])
+				cellBias += e.bias;
+			
+			if(cellBias * Mathf.Sign(bias) < -4f)
+			{
+				die();
+				yield break;
+			}
+			
+			applyBias(interval * cellBias * cellInfluenceFactor);
+
 			//update grid position
 			var index = getGridIndex();
 			if(_currGridIndex != index)
@@ -41,8 +70,14 @@ public class Entity : MonoBehaviour
 				_grid[_currGridIndex].Add(this);
 			}
 
-			yield return new WaitForSeconds(Random.Range(0.5f, 1f) * 0.25f);
+			yield return new WaitForSeconds(interval);
 		}
+	}
+
+	void die()
+	{
+		_grid[_currGridIndex].Remove(this);
+		Destroy(gameObject);
 	}
 
 	public void applyBias(float change)
@@ -59,5 +94,18 @@ public class Entity : MonoBehaviour
 	int getGridIndex()
 	{
 		return GameSession.inst.getGridIndex(transform.position);
+	}
+
+	public void InteractWithTarget()
+	{
+		if (Random.Range(-10, 10) > 0)
+		{
+			//Do good
+		}
+
+		else 
+		{ 
+			//Do evil
+		}
 	}
 }

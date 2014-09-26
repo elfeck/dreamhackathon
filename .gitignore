@@ -6,3 +6,10 @@ UnityVS.Dreamhackathon2014.sln.DotSettings
 /Temp
 Dreamhack_Data
 *.exe
+*.unityproj
+UnityVS.VersionSpecfific.dll*
+ProjectSettings/QualitySettings.asset
+dreamhackathon.userprefs
+Assets/UnityVS/Editor/UnityVS.VersionSpecific.dll
+Assets/UnityVS/Editor/UnityVS.VersionSpecific.dll.meta
+UnityVS.dreamhackathon.sln.DotSettings
