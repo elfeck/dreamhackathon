@@ -51,15 +51,15 @@ public class RandomEvents : MonoBehaviour {
 
     IEnumerator PickEvent(float _updateFreq)
     {
+        float _timer = 0;
+
         for (; ; )
         {
-            if (eventOngoing == false)
+            timer += Time.deltaTime * _updateFreq;
+
+            if (timer > eventDistribution)
             {
-                int _yesOrNo = Random.Range(-1, 1);
-                if (Mathf.Sign(_yesOrNo) == 1)
-                {
-                    StartCoroutine(allEvents[Random.Range(0, allEvents.Count)]);
-                }
+                StartCoroutine(allEvents[Random.Range(0, allEvents.Count)]);
             }
 
             yield return new WaitForSeconds(_updateFreq);
