@@ -8,10 +8,7 @@ public class GameSession : SASSingleton<GameSession>
 	public float spawnRate = 20f;
 
 	public float gridCellSize = 3f;
-	public Transform ground;
-	public Transform homeZoneRed;
-	public Transform homeZoneBlue;
-	public GameObject gameOverScreen;
+	[HideInInspector] public Transform ground;
 
 	public Vector2 minMaxSpeed = Vector2.zero;
 	
@@ -21,6 +18,9 @@ public class GameSession : SASSingleton<GameSession>
 	public float spawnBalancePeriod = 20f;
 	private float _currBalance = 0.5f;
 	private float _startTime = 0f;
+	private int _initialLifes;
+
+	public int lifes = 10;
 
 	public int getGridResolution() {return gridResolution;}
 
@@ -28,10 +28,11 @@ public class GameSession : SASSingleton<GameSession>
 	{
 		base.Awake();
 
+		_initialLifes = lifes;
+		ground = GameObject.FindGameObjectWithTag("Ground").transform;
 		gridResolution = Mathf.CeilToInt(Mathf.Max(ground.localScale.x, ground.localScale.z) / gridCellSize);
-		gameOverScreen.SetActive(false);
 
-		_startTime = Time.time;
+		reset();
 	}
 
 	void OnEnable()
@@ -89,24 +90,33 @@ public class GameSession : SASSingleton<GameSession>
 		//check if an entity is in the final region of the opposing party
 		foreach(var e in Entity.allEntities)
 		{
-			if((e.bias < 0f && isInZone(homeZoneBlue, e.transform.position))
-			 || (e.bias > 0f && isInZone(homeZoneRed, e.transform.position)))
+			if((e.bias < 0f && isInZone(true, e.transform.position))
+			 || (e.bias > 0f && isInZone(false, e.transform.position)))
 			{
-				//LOST
-				gameOverScreen.SetActive(true);
+				e.die();
+				--lifes;
 			}
 		}
 
 		float duration = spawnBalance.keys[spawnBalance.length-1].time;
 		float factor = Mathf.Repeat((Time.time - _startTime) / spawnBalancePeriod, 1f);
 		_currBalance = spawnBalance.Evaluate(factor * duration);
+
+		
 	}
 
-	bool isInZone(Transform zone, Vector3 pos)
+	bool isInZone(bool blue, Vector3 pos)
 	{
-		pos = zone.InverseTransformPoint(pos);
-		return (zone.localScale.x * 0.5f > Mathf.Abs(pos.x)) && (zone.localScale.z * 0.5f > Mathf.Abs(pos.z));
+		var limit = GameSession.inst.ground.localScale.x * 0.49f;
+		return (blue && pos.x > limit) || (!blue && pos.x < -limit);
 	}
 
 	//---------------------------------------------------------------------------//
+
+	public void reset()
+	{
+		lifes = _initialLifes;
+
+		_startTime = Time.time;
+	}
 }

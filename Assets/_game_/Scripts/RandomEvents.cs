@@ -9,6 +9,8 @@ public class RandomEvents : MonoBehaviour {
     public Vector2 speedUpDuration;
     public Vector2 spawnRateMultiplier;
     public Vector2 spawnRateDuration;
+
+    public GameObject colorBombEffect;
     public Vector2 colorBombRadius;
 
     float timer;
@@ -22,6 +24,8 @@ public class RandomEvents : MonoBehaviour {
         allEvents = new List<IEnumerator>() 
         {
             SpeedUp(sides[Random.Range(0, sides.Length)]),
+            SpawnRateUp(),
+            ColorBomb()
         };
     }
 
@@ -38,6 +42,9 @@ public class RandomEvents : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.U))
             StartCoroutine(SpawnRateUp());
+
+        if (Input.GetKeyDown(KeyCode.I))
+            StartCoroutine(ColorBomb());
 	}
 
     IEnumerator PickEvent(float _updateFreq)
@@ -124,32 +131,32 @@ public class RandomEvents : MonoBehaviour {
         eventOngoing = false;
     }
     /// <param name="_sideToBecome">Has to be -1 or 1.</param>
-    //IEnumerator ColorBomb(int _sideToBecome)
-    //{
-    //    float _radius = Random.Range(colorBombRadius.x, colorBombRadius.y);
-    //    float _curSize = 0;
+    IEnumerator ColorBomb()
+    {
+        eventOngoing = true;
 
-    //    while(_curSize < _radius)
-    //    {
-            
-    //    }
+        float _radius = Random.Range(colorBombRadius.x, colorBombRadius.y);
 
-    //    GameObject _ground = GameObject.Find("obj_Ground");
-    //    Vector3 _pos = new Vector3
-    //    (
-    //        _ground.transform.position.x + Random.Range(0, _ground.transform.localScale.x), 
-    //        _ground.transform.position.y, 
-    //        _ground.transform.position.z + Random.Range(0, _ground.transform.localScale.z)
-    //    );
+        GameObject _ground = GameObject.Find("obj_Ground");
+        Vector3 _pos = new Vector3
+        (
+            Random.Range(_ground.transform.position.x - _ground.transform.localScale.x / 4f, _ground.transform.position.x + _ground.transform.localScale.x / 4f), 
+            _ground.transform.position.y,
+            Random.Range(_ground.transform.position.z - _ground.transform.localScale.z / 4f, _ground.transform.position.z + _ground.transform.localScale.z / 4f)
+        );
 
-    //    foreach(Entity _ent in Entity.allEntities)
-    //    {
-    //        if (Vector3.SqrMagnitude(_ent.transform.position - _pos) < Mathf.Sqrt(_radius))
-    //        {
-    //            _ent.applyBias(_sideToBecome);
-    //        }
-    //    }
+        foreach(Entity _ent in Entity.allEntities)
+        {
+            if (Vector3.Distance(_ent.transform.position, _pos) < Mathf.Sqrt(_radius))
+            {
+                _ent.applyBias(Mathf.Sign(_ent.bias) == 1 ? -2 : 2);
+            }
+        }
 
-    //    //Play particle system
-    //}
+        //Play particle system
+        if (colorBombEffect) ObjectPoolController.Instantiate(colorBombEffect, new Vector3(_pos.x, _pos.y + 1, _pos.z), colorBombEffect.transform.rotation);
+
+        eventOngoing = false;
+        yield return null;
+    }
 }

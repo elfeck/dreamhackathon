@@ -22,6 +22,6 @@ public class Movement : MonoBehaviour {
 		//if (pushed) transform.position += speed * Time.deltaTime * pushDir;
 
 		//else transform.position += speed * Time.deltaTime * Vector3.left * Mathf.Sign(thisEntity.bias);
-		transform.position += speed * Time.deltaTime * Vector3.left * thisEntity.bias;
+		transform.position += speed * Time.deltaTime * Vector3.left * Mathf.Pow(Mathf.Abs(thisEntity.bias), 0.33f) * Mathf.Sign(thisEntity.bias);
 	}
 }
