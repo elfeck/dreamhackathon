@@ -14,21 +14,25 @@ public class GameSession : SASSingleton<GameSession>
 	
 	private int gridResolution;
 
+	public bool enableSpawnBalanceCurve = true;
 	public AnimationCurve spawnBalance;
 	public float spawnBalancePeriod = 20f;
 	private float _currBalance = 0.5f;
 	private float _startTime = 0f;
 	private int _initialLifes;
 
-	public int lifes = 10;
+	public int redLifes = 10;
+	public int blueLifes = 10;
+	public bool allowGameOver = true;
 
 	public int getGridResolution() {return gridResolution;}
+	public void setSpawnBalance(float bal) { _currBalance = bal; }
 
 	public override void Awake()
 	{
 		base.Awake();
 
-		_initialLifes = lifes;
+		_initialLifes = redLifes;
 		ground = GameObject.FindGameObjectWithTag("Ground").transform;
 		gridResolution = Mathf.CeilToInt(Mathf.Max(ground.localScale.x, ground.localScale.z) / gridCellSize);
 
@@ -90,18 +94,25 @@ public class GameSession : SASSingleton<GameSession>
 		//check if an entity is in the final region of the opposing party
 		foreach(var e in Entity.allEntities)
 		{
-			if((e.bias < 0f && isInZone(true, e.transform.position))
-			 || (e.bias > 0f && isInZone(false, e.transform.position)))
+			if(e.bias < 0f && isInZone(true, e.transform.position))
 			{
 				e.die();
-				--lifes;
+				if(allowGameOver) --blueLifes;
+			}
+			if(e.bias > 0f && isInZone(false, e.transform.position))
+			{
+				e.die();
+				if(allowGameOver) --redLifes;
 			}
 		}
 
-		float duration = spawnBalance.keys[spawnBalance.length-1].time;
-		float factor = Mathf.Repeat((Time.time - _startTime) / spawnBalancePeriod, 1f);
-		_currBalance = spawnBalance.Evaluate(factor * duration);
 
+		if(enableSpawnBalanceCurve)
+		{
+			float duration = spawnBalance.keys[spawnBalance.length-1].time;
+			float factor = Mathf.Repeat((Time.time - _startTime) / spawnBalancePeriod, 1f);
+			_currBalance = spawnBalance.Evaluate(factor * duration);
+		}
 		
 	}
 
@@ -115,7 +126,7 @@ public class GameSession : SASSingleton<GameSession>
 
 	public void reset()
 	{
-		lifes = _initialLifes;
+		redLifes = blueLifes = _initialLifes;
 
 		_startTime = Time.time;
 	}

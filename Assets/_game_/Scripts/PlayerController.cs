@@ -8,12 +8,14 @@ public enum PlayerPowers
 	Evil = 1
 }
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : SASSingleton<PlayerController>
 {
 	public float conversionSpeed = 1f;
 	public Transform negativeInfluencer;
 	public Transform positiveInfluencer;
 	public float influenceRadius = 3f;
+
+	public int cursors = 2;
 
 	private List<Transform> _influencer = new List<Transform>();
 	private Vector3[] actionPos = new Vector3[2];
@@ -52,6 +54,9 @@ public class PlayerController : MonoBehaviour
 
 		for(int i = 0; i < 2; ++i)
 		{
+			_influencer[i].gameObject.SetActive(i < cursors);
+			if(i >= cursors) continue;
+
 			var ray = Camera.main.ScreenPointToRay(actionPos[(int)i]);
 			RaycastHit hitInfo;
 			if(!Physics.Raycast(ray, out hitInfo, 100f, Layers.Start().Add("Default"))) continue;
