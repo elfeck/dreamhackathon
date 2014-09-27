@@ -136,7 +136,7 @@ public class Entity : MonoBehaviour
 		var size =  GameSession.inst.ground.localScale.x * 0.5f;
 		float danger = Mathf.Clamp01((Mathf.Abs(transform.position.x) - size * dangerZone) / (size * (1f-dangerZone)));
 		if(bias * transform.position.x > 0f) danger = 0f;
-		transform.localScale = Vector3.Lerp(_initialScale, _initialScale * 2.5f, danger);
+		transform.localScale = Vector3.Lerp(_initialScale, _initialScale * 2f, danger);
 	}
 
 	int getGridIndex()

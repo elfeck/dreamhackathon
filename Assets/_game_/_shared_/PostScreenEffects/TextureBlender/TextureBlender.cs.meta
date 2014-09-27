@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 332ba95395215a445983a811eb004e73
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - shader: {fileID: 4800000, guid: 25faf3cba0a199d4fad43e9e0cf28551, type: 1}
+  - blendTexture: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}

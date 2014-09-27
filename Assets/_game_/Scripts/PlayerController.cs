@@ -15,6 +15,9 @@ public class PlayerController : SASSingleton<PlayerController>
 	public Transform positiveInfluencer;
 	public float influenceRadius = 3f;
 
+	private Vector3 _camForward;
+	private Vector3 _camPos;
+
 	public int cursors = 2;
 
 	private List<Transform> _influencer = new List<Transform>();
@@ -30,21 +33,17 @@ public class PlayerController : SASSingleton<PlayerController>
 			_influencer[i].localScale = Vector3.one * influenceRadius;
 
 		actionPos[0] = actionPos[1] = new Vector3(Screen.width, Screen.height, 0f) * 0.5f;
+
+		_camForward = Camera.main.transform.forward;
+		_camPos = Camera.main.transform.position;
 	}
 
 	void Update()
 	{
-		//if(Input.GetKeyDown(KeyCode.E))
-		//	_useEyetracking = !_useEyetracking;
+		Camera.main.transform.forward = _camForward;
+		Camera.main.transform.position = _camPos;
 
-		//if(_useEyetracking && EyeXController.inst.isDataAvailable())
-		//{
-		//	var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
-		//	actionPos[0] = new Vector3(tmp.x, tmp.y, 0f);
-		//}
-		//else 
-			actionPos[0] = Input.mousePosition;
-
+		actionPos[0] = Input.mousePosition;
 		actionPos[1].x = Screen.width - actionPos[0].x;
 		actionPos[1].y = Screen.height - actionPos[0].y;
 

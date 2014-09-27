@@ -152,6 +152,8 @@ public class GameSession : SASSingleton<GameSession>
 		if(blue) --blueLifes;
 		else --redLifes;
 
+		pos.x += blue ? -5f : 5f;
+
 		var prefab = blue ? blueMinusEffect : redMinusEffect;
 		if(prefab) ObjectPoolController.Instantiate(prefab, pos, prefab.transform.rotation);
 
