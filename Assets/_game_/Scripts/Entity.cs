@@ -125,8 +125,8 @@ public class Entity : MonoBehaviour
 
 		_influencedTime -= Time.deltaTime;
 		_influencedTime = Mathf.Max(0, _influencedTime);
-		if(_influencedTime > 0.5f)
-			die();
+		//if(_influencedTime > 0.5f)
+		//	die();
 
 		//========================================//
 
