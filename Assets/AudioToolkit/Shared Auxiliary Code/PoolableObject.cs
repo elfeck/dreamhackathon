@@ -1,4 +1,4 @@
-﻿/*************************************************************
+/*************************************************************
  *           Unity Object Pool (c) by ClockStone 2011        *
  * 
  * Allows to "pool" prefab objects to avoid large number of
@@ -485,7 +485,7 @@ static public class ObjectPoolController
         {
             if ( !poolObj._createdWithPoolController )
             {
-                Debug.LogWarning( "Poolable object " + obj.name + " not created with ObjectPoolController" );
+                Debug.LogWarning( "Poolable object " + obj.name + " not created with ObjectPoolController" , obj);
             }
             GameObject.Destroy( obj ); // prefab not pooled, destroy normally
         }

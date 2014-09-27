@@ -81,7 +81,7 @@ public class PlayerController : SASSingleton<PlayerController>
 
 		//========================================//
 
-		if(Input.GetKeyDown(KeyCode.Escape))
+		if(Input.GetKeyDown(KeyCode.Escape) || (GameSession.inst.gameOver() && (Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Space))))
 			Application.LoadLevel("Menu");
 	}
 }
