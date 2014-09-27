@@ -6,6 +6,6 @@ public class GameOverScreen : MonoBehaviour
 
 	void Update()
 	{
-		guiText.enabled = GameSession.inst.lifes <= 0;
+		guiText.enabled = GameSession.inst.allowGameOver && (GameSession.inst.redLifes <= 0 || GameSession.inst.blueLifes <= 0);
 	}
 }

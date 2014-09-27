@@ -3,12 +3,15 @@ using System.Collections;
 
 public class LifeCounter : MonoBehaviour
 {
+	public bool blue = true;
 
 	void Update ()
 	{
-		if(GameSession.inst.lifes > 0)
+		var lifes = blue ? GameSession.inst.blueLifes : GameSession.inst.redLifes;
+
+		if(lifes > 0 && GameSession.inst.allowGameOver)
 		{
-			guiText.text = "Lifes: " + GameSession.inst.lifes;
+			guiText.text = lifes.ToString();
 			guiText.enabled = true;
 		}
 		else

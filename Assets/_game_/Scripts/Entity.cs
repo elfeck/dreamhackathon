@@ -6,14 +6,22 @@ public class Entity : MonoBehaviour
 {
 	static private List<HashSet<Entity>> _grid;
 	static public List<Entity> allEntities = new List<Entity>();
+	static public int deathCount = 0;
 
 	static public void destroyAll()
 	{
 		foreach(var e in allEntities)
 			Destroy(e.gameObject);
-		foreach(var g in _grid)
-			g.Clear();
+
+		if(_grid != null)
+		{
+			foreach(var g in _grid)
+				g.Clear();
+			_grid.Clear();
+		}
+
 		allEntities.Clear();
+		_grid = null;
 	}
 
 	//---------------------------------------------------------------------------//
@@ -97,6 +105,7 @@ public class Entity : MonoBehaviour
 	{
 		_grid[_currGridIndex].Remove(this);
 		Destroy(gameObject);
+		deathCount++;
 
 		if(deathEffect) ObjectPoolController.Instantiate(deathEffect, transform.position, deathEffect.transform.rotation);
 	}

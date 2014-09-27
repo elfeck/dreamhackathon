@@ -8,16 +8,18 @@ public enum PlayerPowers
 	Evil = 1
 }
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : SASSingleton<PlayerController>
 {
 	public float conversionSpeed = 1f;
 	public Transform negativeInfluencer;
 	public Transform positiveInfluencer;
 	public float influenceRadius = 3f;
 
+	public int cursors = 2;
+
 	private List<Transform> _influencer = new List<Transform>();
 	private Vector3[] actionPos = new Vector3[2];
-	private bool _useEyetracking = false;
+	//private bool _useEyetracking = false;
 
 	void Start()
 	{
@@ -32,15 +34,15 @@ public class PlayerController : MonoBehaviour
 
 	void Update()
 	{
-		if(Input.GetKeyDown(KeyCode.E))
-			_useEyetracking = !_useEyetracking;
+		//if(Input.GetKeyDown(KeyCode.E))
+		//	_useEyetracking = !_useEyetracking;
 
-		if(_useEyetracking && EyeXController.inst.isDataAvailable())
-		{
-			var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
-			actionPos[0] = new Vector3(tmp.x, tmp.y, 0f);
-		}
-		else 
+		//if(_useEyetracking && EyeXController.inst.isDataAvailable())
+		//{
+		//	var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
+		//	actionPos[0] = new Vector3(tmp.x, tmp.y, 0f);
+		//}
+		//else 
 			actionPos[0] = Input.mousePosition;
 
 		actionPos[1].x = Screen.width - actionPos[0].x;
@@ -52,6 +54,9 @@ public class PlayerController : MonoBehaviour
 
 		for(int i = 0; i < 2; ++i)
 		{
+			_influencer[i].gameObject.SetActive(i < cursors);
+			if(i >= cursors) continue;
+
 			var ray = Camera.main.ScreenPointToRay(actionPos[(int)i]);
 			RaycastHit hitInfo;
 			if(!Physics.Raycast(ray, out hitInfo, 100f, Layers.Start().Add("Default"))) continue;
@@ -72,8 +77,12 @@ public class PlayerController : MonoBehaviour
 		if(Input.GetKeyDown(KeyCode.Space))
 		{
 			//reset!
-			Entity.destroyAll();
 			GameSession.inst.reset();
 		}
+
+		//========================================//
+
+		if(Input.GetKeyDown(KeyCode.Escape))
+			Application.LoadLevel("Menu");
 	}
 }
