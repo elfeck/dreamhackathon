@@ -4,14 +4,16 @@ using System.Collections.Generic;
 
 public class RandomEvents : MonoBehaviour {
 
-    public float eventDistribution;
-    public Vector2 speedUpMultiplier;
-    public Vector2 speedUpDuration;
-    public Vector2 spawnRateMultiplier;
-    public Vector2 spawnRateDuration;
-
-    public GameObject colorBombEffect;
-    public Vector2 colorBombRadius;
+    [SerializeField] float eventDistribution;
+    [SerializeField] bool speedUpEnabled;
+    [SerializeField] Vector2 speedUpMultiplier;
+    [SerializeField] Vector2 speedUpDuration;
+    [SerializeField] bool spawnRateEnabled;
+    [SerializeField] Vector2 spawnRateMultiplier;
+    [SerializeField] Vector2 spawnRateDuration;
+    [SerializeField] bool colorBombEnabled;
+    [SerializeField] GameObject colorBombEffect;
+    [SerializeField] Vector2 colorBombRadius;
 
     float timer;
     bool eventOngoing;
@@ -68,95 +70,104 @@ public class RandomEvents : MonoBehaviour {
     /// <param name="_sideToAffect">Has to be -1, 1 or 2. 2 means "both sides"</param>
     IEnumerator SpeedUp(int _sideToAffect)
     {
-        eventOngoing = true;
-
-        timer = 0;
-        float _duration = Random.Range(speedUpDuration.x, speedUpDuration.y);
-        float _speed = Random.Range(speedUpMultiplier.x, speedUpMultiplier.y);
-
-        List<Entity> _affected = new List<Entity>();
-
-        if(_sideToAffect == -1 || _sideToAffect == 1)
+        if(speedUpEnabled)
         {
-            foreach (Entity _ent in Entity.allEntities)
+            eventOngoing = true;
+
+            timer = 0;
+            float _duration = Random.Range(speedUpDuration.x, speedUpDuration.y);
+            float _speed = Random.Range(speedUpMultiplier.x, speedUpMultiplier.y);
+
+            List<Entity> _affected = new List<Entity>();
+
+            if (_sideToAffect == -1 || _sideToAffect == 1)
             {
-                if (Mathf.Sign(_ent.bias) == _sideToAffect)
+                foreach (Entity _ent in Entity.allEntities)
                 {
-                    _ent.movement.speed *= _speed;
-                    _affected.Add(_ent);
+                    if (Mathf.Sign(_ent.bias) == _sideToAffect)
+                    {
+                        _ent.movement.speed *= _speed;
+                        _affected.Add(_ent);
+                    }
                 }
             }
-        }
 
-        else //Both sides
-        {
-            foreach (Entity _ent in Entity.allEntities)
+            else //Both sides
             {
-                _ent.movement.speed *= _speed;
-                _affected.Add(_ent); //Always set so as not to affect later spawned entities
+                foreach (Entity _ent in Entity.allEntities)
+                {
+                    _ent.movement.speed *= _speed;
+                    _affected.Add(_ent); //Always set so as not to affect later spawned entities
+                }
             }
-        }
 
-        while (timer < _duration)
-        {
-            timer += Time.deltaTime;
-            yield return null;
-        }
+            while (timer < _duration)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
 
-        foreach (Entity _ent in _affected)
-        {
-            _ent.movement.speed /= _speed;
-        }
+            foreach (Entity _ent in _affected)
+            {
+                _ent.movement.speed /= _speed;
+            }
 
-        eventOngoing = false;
+            eventOngoing = false;   
+        }
     }
     IEnumerator SpawnRateUp()
     {
-        eventOngoing = true;
-
-        timer = 0;
-        float _duration = Random.Range(spawnRateDuration.x, spawnRateDuration.y);
-        float _multiplier = Random.Range(spawnRateMultiplier.x, spawnRateMultiplier.y);
-
-        GameSession.inst.spawnRate *= _multiplier;
-
-        while (timer < _duration)
+        if(spawnRateEnabled)
         {
-            timer += Time.deltaTime;
-            yield return null;
-        }
+            eventOngoing = true;
 
-        GameSession.inst.spawnRate /= _multiplier;
+            timer = 0;
+            float _duration = Random.Range(spawnRateDuration.x, spawnRateDuration.y);
+            float _multiplier = Random.Range(spawnRateMultiplier.x, spawnRateMultiplier.y);
 
-        eventOngoing = false;
+            GameSession.inst.spawnRate *= _multiplier;
+
+            while (timer < _duration)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            GameSession.inst.spawnRate /= _multiplier;
+
+            eventOngoing = false;
+        } 
     }
     /// <param name="_sideToBecome">Has to be -1 or 1.</param>
     IEnumerator ColorBomb()
     {
-        eventOngoing = true;
-
-        float _radius = Random.Range(colorBombRadius.x, colorBombRadius.y);
-
-        GameObject _ground = GameObject.Find("obj_Ground");
-        Vector3 _pos = new Vector3
-        (
-            Random.Range(_ground.transform.position.x - _ground.transform.localScale.x / 4f, _ground.transform.position.x + _ground.transform.localScale.x / 4f), 
-            _ground.transform.position.y,
-            Random.Range(_ground.transform.position.z - _ground.transform.localScale.z / 4f, _ground.transform.position.z + _ground.transform.localScale.z / 4f)
-        );
-
-        foreach(Entity _ent in Entity.allEntities)
+        if(colorBombEnabled)
         {
-            if (Vector3.Distance(_ent.transform.position, _pos) < Mathf.Sqrt(_radius))
+            eventOngoing = true;
+
+            float _radius = Random.Range(colorBombRadius.x, colorBombRadius.y);
+
+            GameObject _ground = GameObject.Find("obj_Ground");
+            Vector3 _pos = new Vector3
+            (
+                Random.Range(_ground.transform.position.x - _ground.transform.localScale.x / 4f, _ground.transform.position.x + _ground.transform.localScale.x / 4f),
+                _ground.transform.position.y,
+                Random.Range(_ground.transform.position.z - _ground.transform.localScale.z / 4f, _ground.transform.position.z + _ground.transform.localScale.z / 4f)
+            );
+
+            foreach (Entity _ent in Entity.allEntities)
             {
-                _ent.applyBias(Mathf.Sign(_ent.bias) == 1 ? -2 : 2);
+                if (Vector3.Distance(_ent.transform.position, _pos) < Mathf.Sqrt(_radius))
+                {
+                    _ent.applyBias(Mathf.Sign(_ent.bias) == 1 ? -2 : 2);
+                }
             }
+
+            //Play particle system
+            if (colorBombEffect) ObjectPoolController.Instantiate(colorBombEffect, new Vector3(_pos.x, _pos.y + 1, _pos.z), colorBombEffect.transform.rotation);
+
+            eventOngoing = false;
+            yield return null;
         }
-
-        //Play particle system
-        if (colorBombEffect) ObjectPoolController.Instantiate(colorBombEffect, new Vector3(_pos.x, _pos.y + 1, _pos.z), colorBombEffect.transform.rotation);
-
-        eventOngoing = false;
-        yield return null;
     }
 }
