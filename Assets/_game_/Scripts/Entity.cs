@@ -11,6 +11,8 @@ public class Entity : MonoBehaviour
 	private int _currGridIndex = -1;
 	public float cellInfluenceFactor = 0.2f;
 
+	private float _influencedTime = 0f;
+
 	public float reach;
 	[HideInInspector]
 	public Movement movement;
@@ -85,11 +87,18 @@ public class Entity : MonoBehaviour
 	{
 		bias += change;
 		bias = Mathf.Clamp(bias, -1f, 1f);
+
+		_influencedTime += 2f * Time.deltaTime;
 	}
 
 	void Update()
 	{
 		renderer.material.color = Color.Lerp(Color.red, Color.blue, Mathf.Clamp01((bias + 1f) / 2f));
+
+		_influencedTime -= Time.deltaTime;
+		_influencedTime = Mathf.Max(0, _influencedTime);
+		if(_influencedTime > 0.5f)
+			die();
 	}
 
 	int getGridIndex()

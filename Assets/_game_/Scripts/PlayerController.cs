@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
 
 	private List<Transform> _influencer = new List<Transform>();
 	private Vector3[] actionPos = new Vector3[2];
+	private bool _useEyetracking = false;
 
 	void Start()
 	{
@@ -25,27 +26,43 @@ public class PlayerController : MonoBehaviour
 
 		for(int i = 0; i < _influencer.Count; ++i) 
 			_influencer[i].localScale = Vector3.one * influenceRadius;
+
+		actionPos[0] = actionPos[1] = new Vector3(Screen.width, Screen.height, 0f) * 0.5f;
 	}
 
 	void Update()
 	{
+		if(Input.GetKeyDown(KeyCode.Space))
+			_useEyetracking = !_useEyetracking;
+
 		//get gaze point form datastreem (only if info valid and eyeX there!)
-		if(EyeXController.inst.isDataAvailable())
+		//if(EyeXController.inst.isDataAvailable())
+		//{
+		//	//mouse position is first input
+		//	actionPos[0] = Input.mousePosition;
+
+		//	var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
+		//	actionPos[1] = new Vector3(tmp.x, tmp.y, 0f);
+		//}
+		//else
+		//{
+		//	//alternative control scheme
+		//	if(Input.GetKey(KeyCode.LeftControl))
+		//		actionPos[0] = Input.mousePosition;
+		//	else if(Input.GetKey(KeyCode.Space))
+		//		actionPos[1] = Input.mousePosition;
+		//}
+
+		if(_useEyetracking && EyeXController.inst.isDataAvailable())
 		{
-			//mouse position is first input
+			var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
+			actionPos[0] = new Vector3(tmp.x, tmp.y, 0f);
+		}
+		else 
 			actionPos[0] = Input.mousePosition;
 
-			var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
-			actionPos[1] = new Vector3(tmp.x, tmp.y, 0f);
-		}
-		else
-		{
-			//alternative control scheme
-			if(Input.GetKey(KeyCode.LeftControl))
-				actionPos[0] = Input.mousePosition;
-			else if(Input.GetKey(KeyCode.Space))
-				actionPos[1] = Input.mousePosition;
-		}
+		actionPos[1].x = Screen.width - actionPos[0].x;
+		actionPos[1].y = Screen.height - actionPos[0].y;
 
 		//========================================//
 
@@ -65,11 +82,11 @@ public class PlayerController : MonoBehaviour
 				e.applyBias(bias * Time.deltaTime * conversionSpeed);
 
 
-                //Stefan's test-change
-                //Vector3 _tmp = e.transform.position - ;
-                //_tmp.Normalize();
-                //e.movement.pushDir = _tmp;
-                //e.movement.pushed = true;
+				//Stefan's test-change
+				//Vector3 _tmp = e.transform.position - ;
+				//_tmp.Normalize();
+				//e.movement.pushDir = _tmp;
+				//e.movement.pushed = true;
 			}
 
 			_influencer[i].position = hitInfo.point;

@@ -12,8 +12,15 @@ public class GameSession : SASSingleton<GameSession>
 	public Transform homeZoneRed;
 	public Transform homeZoneBlue;
 	public GameObject gameOverScreen;
+
+	public Vector2 minMaxSpeed = Vector2.zero;
 	
 	private int gridResolution;
+
+	public AnimationCurve spawnBalance;
+	public float spawnBalancePeriod = 20f;
+	private float _currBalance = 0.5f;
+	private float _startTime = 0f;
 
 	public int getGridResolution() {return gridResolution;}
 
@@ -23,6 +30,8 @@ public class GameSession : SASSingleton<GameSession>
 
 		gridResolution = Mathf.CeilToInt(Mathf.Max(ground.localScale.x, ground.localScale.z) / gridCellSize);
 		gameOverScreen.SetActive(false);
+
+		_startTime = Time.time;
 	}
 
 	void OnEnable()
@@ -52,12 +61,16 @@ public class GameSession : SASSingleton<GameSession>
 		var go = Instantiate(entity) as GameObject;
 		var e = go.GetComponent<Entity>();
 
+		//define bias
+		e.bias = Random.Range(0.3f, 1f);
+		if(Random.value < _currBalance) e.bias *= -1f;
+
 		var pos = go.transform.position;
 		pos.x = Mathf.Sign(e.bias) * ground.localScale.x * 0.5f;
 		pos.z = Random.Range(-1f, 1f) * ground.localScale.z * 0.5f;
 		go.transform.position = pos;
 
-		go.GetComponent<Entity>();
+		e.movement.speed = Random.Range(minMaxSpeed.x, minMaxSpeed.y);
 	}
 
 	public int getGridIndex(Vector3 pos)
@@ -83,6 +96,10 @@ public class GameSession : SASSingleton<GameSession>
 				gameOverScreen.SetActive(true);
 			}
 		}
+
+		float duration = spawnBalance.keys[spawnBalance.length-1].time;
+		float factor = Mathf.Repeat((Time.time - _startTime) / spawnBalancePeriod, 1f);
+		_currBalance = spawnBalance.Evaluate(factor * duration);
 	}
 
 	bool isInZone(Transform zone, Vector3 pos)
