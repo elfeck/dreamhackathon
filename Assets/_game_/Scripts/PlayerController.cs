@@ -63,6 +63,13 @@ public class PlayerController : MonoBehaviour
 
 				float bias = i == (int)PlayerPowers.Good ? 1f : -1f;
 				e.applyBias(bias * Time.deltaTime * conversionSpeed);
+
+
+                //Stefan's test-change
+                //Vector3 _tmp = e.transform.position - ;
+                //_tmp.Normalize();
+                //e.movement.pushDir = _tmp;
+                //e.movement.pushed = true;
 			}
 
 			_influencer[i].position = hitInfo.point;

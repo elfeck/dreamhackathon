@@ -96,17 +96,4 @@ public class Entity : MonoBehaviour
 	{
 		return GameSession.inst.getGridIndex(transform.position);
 	}
-
-	public void InteractWithTarget()
-	{
-		if(Random.Range(-10, 10) > 0)
-		{
-			//Do good
-		}
-
-		else
-		{
-			//Do evil
-		}
-	}
 }
