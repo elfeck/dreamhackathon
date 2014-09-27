@@ -21,6 +21,8 @@ public class GameSession : SASSingleton<GameSession>
 	private float _startTime = 0f;
 	private int _initialLifes;
 
+	private float _currTimeScale = 1f;
+
 	public int redLifes = 10;
 	public int blueLifes = 10;
 	public bool allowGameOver = true;
@@ -90,6 +92,24 @@ public class GameSession : SASSingleton<GameSession>
 
 	//---------------------------------------------------------------------------//
 
+	void Update()
+	{
+		if(gameOver())
+			_currTimeScale = 0.001f;
+		else
+		{
+			if(allowGameOver) _currTimeScale = 1f;
+			else
+			{
+				if(_currTimeScale < 0.98f)
+					_currTimeScale = Mathf.Lerp(_currTimeScale, 1f, Time.deltaTime * 0.2f);
+				else _currTimeScale = 1f;
+			}
+		}
+
+		Time.timeScale = _currTimeScale;
+	}
+
 	void slowUpdate()
 	{
 		Screen.showCursor = false;
@@ -97,15 +117,11 @@ public class GameSession : SASSingleton<GameSession>
 		//check if an entity is in the final region of the opposing party
 		foreach(var e in Entity.allEntities)
 		{
-			if(e.bias < 0f && isInZone(true, e.transform.position))
+			if((e.bias < 0f && isInZone(true, e.transform.position))
+				|| (e.bias > 0f && isInZone(false, e.transform.position)))
 			{
 				e.die();
-				if(allowGameOver) --blueLifes;
-			}
-			if(e.bias > 0f && isInZone(false, e.transform.position))
-			{
-				e.die();
-				if(allowGameOver) --redLifes;
+				removeLife(e.bias < 0f, e.transform.position);
 			}
 		}
 
@@ -123,6 +139,24 @@ public class GameSession : SASSingleton<GameSession>
 	{
 		var limit = GameSession.inst.ground.localScale.x * 0.49f;
 		return (blue && pos.x > limit) || (!blue && pos.x < -limit);
+	}
+
+
+	public GameObject redMinusEffect;
+	public GameObject blueMinusEffect;
+
+	void removeLife(bool blue, Vector3 pos)
+	{
+		if(!allowGameOver) return;
+
+		if(blue) --blueLifes;
+		else --redLifes;
+
+		var prefab = blue ? blueMinusEffect : redMinusEffect;
+		if(prefab) ObjectPoolController.Instantiate(prefab, pos, prefab.transform.rotation);
+
+		//slow down a little
+		_currTimeScale = 0.01f;
 	}
 
 	//---------------------------------------------------------------------------//

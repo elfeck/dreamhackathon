@@ -103,7 +103,8 @@ public class Entity : MonoBehaviour
 
 	public void die()
 	{
-		_grid[_currGridIndex].Remove(this);
+		if(_grid != null)
+			_grid[_currGridIndex].Remove(this);
 		Destroy(gameObject);
 		deathCount++;
 
@@ -125,8 +126,8 @@ public class Entity : MonoBehaviour
 
 		_influencedTime -= Time.deltaTime;
 		_influencedTime = Mathf.Max(0, _influencedTime);
-		if(_influencedTime > 0.5f)
-			die();
+		//if(_influencedTime > 0.5f)
+		//	die();
 
 		//========================================//
 
