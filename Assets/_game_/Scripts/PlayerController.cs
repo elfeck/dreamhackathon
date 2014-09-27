@@ -19,7 +19,7 @@ public class PlayerController : SASSingleton<PlayerController>
 
 	private List<Transform> _influencer = new List<Transform>();
 	private Vector3[] actionPos = new Vector3[2];
-	private bool _useEyetracking = false;
+	//private bool _useEyetracking = false;
 
 	void Start()
 	{
@@ -34,15 +34,15 @@ public class PlayerController : SASSingleton<PlayerController>
 
 	void Update()
 	{
-		if(Input.GetKeyDown(KeyCode.E))
-			_useEyetracking = !_useEyetracking;
+		//if(Input.GetKeyDown(KeyCode.E))
+		//	_useEyetracking = !_useEyetracking;
 
-		if(_useEyetracking && EyeXController.inst.isDataAvailable())
-		{
-			var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
-			actionPos[0] = new Vector3(tmp.x, tmp.y, 0f);
-		}
-		else 
+		//if(_useEyetracking && EyeXController.inst.isDataAvailable())
+		//{
+		//	var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
+		//	actionPos[0] = new Vector3(tmp.x, tmp.y, 0f);
+		//}
+		//else 
 			actionPos[0] = Input.mousePosition;
 
 		actionPos[1].x = Screen.width - actionPos[0].x;
@@ -84,7 +84,6 @@ public class PlayerController : SASSingleton<PlayerController>
 		if(Input.GetKeyDown(KeyCode.Space))
 		{
 			//reset!
-			Entity.destroyAll();
 			GameSession.inst.reset();
 		}
 

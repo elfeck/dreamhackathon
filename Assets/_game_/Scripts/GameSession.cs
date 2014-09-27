@@ -131,5 +131,7 @@ public class GameSession : SASSingleton<GameSession>
 
 		_startTime = Time.time;
 		Entity.deathCount = 0;
+
+		Entity.destroyAll();
 	}
 }

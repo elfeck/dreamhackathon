@@ -12,9 +12,16 @@ public class Entity : MonoBehaviour
 	{
 		foreach(var e in allEntities)
 			Destroy(e.gameObject);
-		foreach(var g in _grid)
-			g.Clear();
+
+		if(_grid != null)
+		{
+			foreach(var g in _grid)
+				g.Clear();
+			_grid.Clear();
+		}
+
 		allEntities.Clear();
+		_grid = null;
 	}
 
 	//---------------------------------------------------------------------------//

@@ -61,11 +61,20 @@ public class TutorialController : MonoBehaviour
 
 		//========================================//
 
-		yield return new WaitForSeconds(12f);
+		yield return new WaitForSeconds(9f);
+		
+
+		Time.timeScale = 0.25f;
+		yield return StartCoroutine(showTextCo("Make sure neither army reaches the other side!", 4f * Time.timeScale));
+		GameSession.inst.allowGameOver = true;
+		yield return new WaitForSeconds(1f * Time.timeScale);
+		yield return StartCoroutine(showTextCo("If one empire falls, the war is over...", 4f * Time.timeScale));
+		Time.timeScale = 1f;
+		yield return new WaitForSeconds(5f * Time.timeScale);
+
 
 		PlayerController.inst.cursors = 0;
 		GameSession.inst.spawnRate = 40f;
-
 		Time.timeScale = 0.25f;
 		yield return StartCoroutine(showTextCo("Well done! The war goes on!", 3f * Time.timeScale));
 
