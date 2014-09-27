@@ -96,12 +96,4 @@ public class Entity : MonoBehaviour
 	{
 		return GameSession.inst.getGridIndex(transform.position);
 	}
-<<<<<<< HEAD
-=======
-
-	public void InteractWithTarget()
-	{
-
-	}
->>>>>>> 7892e336a275765382cac6a71a505b4d2bddabdd
 }
