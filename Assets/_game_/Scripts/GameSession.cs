@@ -21,7 +21,12 @@ public class GameSession : SASSingleton<GameSession>
 	private float _startTime = 0f;
 	private int _initialLifes;
 
+	public AnimationCurve spawnPositionProfile;
+	public Vector2 spawnProfileOffsetChange = Vector2.zero;
+	private Vector2 _spawnOffset = Vector2.zero;
+
 	private float _currTimeScale = 1f;
+	private float _timeScaleTarget = 1f;
 
 	public int redLifes = 10;
 	public int blueLifes = 10;
@@ -66,7 +71,7 @@ public class GameSession : SASSingleton<GameSession>
 
 	private void spawnGuy()
 	{
-		var go = Instantiate(entity) as GameObject;
+		var go = ObjectPoolController.Instantiate(entity, entity.transform.position, entity.transform.rotation) as GameObject;
 		var e = go.GetComponent<Entity>();
 
 		//define bias
@@ -75,7 +80,8 @@ public class GameSession : SASSingleton<GameSession>
 
 		var pos = go.transform.position;
 		pos.x = Mathf.Sign(e.bias) * ground.localScale.x * 0.5f;
-		pos.z = Random.Range(-1f, 1f) * ground.localScale.z * 0.5f;
+		var zPos = Mathf.Clamp01(spawnPositionProfile.Evaluate(_spawnOffset[e.bias > 0f ? 0 : 1] + Random.Range(0f, 1f))) * 2f - 1f;
+		pos.z = zPos * ground.localScale.z * 0.5f;
 		go.transform.position = pos;
 
 		e.movement.speed = Random.Range(minMaxSpeed.x, minMaxSpeed.y);
@@ -99,23 +105,29 @@ public class GameSession : SASSingleton<GameSession>
 
 		if(allowTimescaleChange)
 		{
+			//change target timescale over time
+			float delta = (Time.time - _startTime);
+			_timeScaleTarget = 1f + delta * delta / 120f / 120f;
+
+
 			if(gameOver())
 				_currTimeScale = 0.001f;
 			else
 			{
 				if(allowGameOver)
 				{
-					if(_currTimeScale < 0.98f)
-						_currTimeScale = Mathf.Lerp(_currTimeScale, 1f, 0.1f);
-					else _currTimeScale = 1f;
+					if(_currTimeScale < _timeScaleTarget * 0.99f)
+						_currTimeScale = Mathf.Lerp(_currTimeScale, _timeScaleTarget, 0.1f);
+					else _currTimeScale = _timeScaleTarget;
 				}
-				else _currTimeScale = 1f;
+				else _currTimeScale = _timeScaleTarget;
 			}
 
-			Time.timeScale = _currTimeScale;
-		}		
+			Time.timeScale = _currTimeScale;			
+		}
 	}
 
+	static List<Entity> _tmp_toDelete = new List<Entity>();
 	void slowUpdate()
 	{
 		Screen.showCursor = false;
@@ -126,10 +138,13 @@ public class GameSession : SASSingleton<GameSession>
 			if((e.bias < 0f && isInZone(true, e.transform.position))
 				|| (e.bias > 0f && isInZone(false, e.transform.position)))
 			{
-				e.die();
+				_tmp_toDelete.Add(e);
 				removeLife(e.bias < 0f, e.transform.position);
 			}
 		}
+		for(int i = 0; i < _tmp_toDelete.Count; ++i)
+			_tmp_toDelete[i].die();
+		_tmp_toDelete.Clear();
 
 
 		if(enableSpawnBalanceCurve)
@@ -138,6 +153,11 @@ public class GameSession : SASSingleton<GameSession>
 			float factor = Mathf.Repeat((Time.time - _startTime) / spawnBalancePeriod, 1f);
 			_currBalance = spawnBalance.Evaluate(factor * duration);
 		}
+
+		_spawnOffset += Time.deltaTime * spawnProfileOffsetChange;
+		var profileLength = spawnPositionProfile.keys[spawnPositionProfile.length-1].time;
+		for(int i = 0; i < 2; ++i )
+			if(_spawnOffset[i] > profileLength - 1f) _spawnOffset[i] = 0f;
 		
 	}
 

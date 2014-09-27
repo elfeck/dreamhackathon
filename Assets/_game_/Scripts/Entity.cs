@@ -11,7 +11,7 @@ public class Entity : MonoBehaviour
 	static public void destroyAll()
 	{
 		foreach(var e in allEntities)
-			Destroy(e.gameObject);
+			ObjectPoolController.Destroy(e.gameObject);
 
 		if(_grid != null)
 		{
@@ -34,13 +34,13 @@ public class Entity : MonoBehaviour
 
 	private float _influencedTime = 0f;
 
-	public float reach;
 	[HideInInspector]
 	public Movement movement;
 	private Vector3 _initialScale;
 
 	void Awake()
 	{
+		_currGridIndex = -1;
 		movement = GetComponent<Movement>();
 		_initialScale = transform.localScale;
 
@@ -49,6 +49,7 @@ public class Entity : MonoBehaviour
 
 	void OnDestroy()
 	{
+		transform.localScale = _initialScale;
 		allEntities.Remove(this);
 	}
 
@@ -105,7 +106,7 @@ public class Entity : MonoBehaviour
 	{
 		if(_grid != null)
 			_grid[_currGridIndex].Remove(this);
-		Destroy(gameObject);
+		ObjectPoolController.Destroy(gameObject);
 		deathCount++;
 
 		if(deathEffect) ObjectPoolController.Instantiate(deathEffect, transform.position, deathEffect.transform.rotation);
