@@ -103,7 +103,8 @@ public class Entity : MonoBehaviour
 
 	public void die()
 	{
-		_grid[_currGridIndex].Remove(this);
+		if(_grid != null)
+			_grid[_currGridIndex].Remove(this);
 		Destroy(gameObject);
 		deathCount++;
 
