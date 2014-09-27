@@ -32,26 +32,8 @@ public class PlayerController : MonoBehaviour
 
 	void Update()
 	{
-		if(Input.GetKeyDown(KeyCode.Space))
+		if(Input.GetKeyDown(KeyCode.E))
 			_useEyetracking = !_useEyetracking;
-
-		//get gaze point form datastreem (only if info valid and eyeX there!)
-		//if(EyeXController.inst.isDataAvailable())
-		//{
-		//	//mouse position is first input
-		//	actionPos[0] = Input.mousePosition;
-
-		//	var tmp = actionPos[1] = EyeXController.inst.getGazePointScreenCoords();
-		//	actionPos[1] = new Vector3(tmp.x, tmp.y, 0f);
-		//}
-		//else
-		//{
-		//	//alternative control scheme
-		//	if(Input.GetKey(KeyCode.LeftControl))
-		//		actionPos[0] = Input.mousePosition;
-		//	else if(Input.GetKey(KeyCode.Space))
-		//		actionPos[1] = Input.mousePosition;
-		//}
 
 		if(_useEyetracking && EyeXController.inst.isDataAvailable())
 		{
@@ -90,6 +72,15 @@ public class PlayerController : MonoBehaviour
 			}
 
 			_influencer[i].position = hitInfo.point;
+		}
+
+		//========================================//
+
+		if(Input.GetKeyDown(KeyCode.Space))
+		{
+			//reset!
+			Entity.destroyAll();
+			GameSession.inst.reset();
 		}
 	}
 }

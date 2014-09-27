@@ -7,21 +7,34 @@ public class Entity : MonoBehaviour
 	static private List<HashSet<Entity>> _grid;
 	static public List<Entity> allEntities = new List<Entity>();
 
+	static public void destroyAll()
+	{
+		foreach(var e in allEntities)
+			Destroy(e.gameObject);
+		foreach(var g in _grid)
+			g.Clear();
+		allEntities.Clear();
+	}
+
+	//---------------------------------------------------------------------------//
+
 	public float bias = 0f;
 	private int _currGridIndex = -1;
 	public float cellInfluenceFactor = 0.2f;
+
+	public GameObject deathEffect;
 
 	private float _influencedTime = 0f;
 
 	public float reach;
 	[HideInInspector]
 	public Movement movement;
+	private Vector3 _initialScale;
 
 	void Awake()
 	{
 		movement = GetComponent<Movement>();
-
-		bias = Mathf.Sign(Random.Range(-1f, 1f));
+		_initialScale = transform.localScale;
 
 		allEntities.Add(this);
 	}
@@ -62,7 +75,10 @@ public class Entity : MonoBehaviour
 				yield break;
 			}
 
-			//applyBias(interval * cellBias * cellInfluenceFactor);
+			//drive towards average
+			//var avg = cellBias / (float)(_grid[_currGridIndex].Count);
+			//applyBias(interval * Mathf.Sign(avg - bias) * cellInfluenceFactor);
+			applyBias(interval * cellBias * cellInfluenceFactor);
 
 			//update grid position
 			var index = getGridIndex();
@@ -77,18 +93,21 @@ public class Entity : MonoBehaviour
 		}
 	}
 
-	void die()
+	public void die()
 	{
 		_grid[_currGridIndex].Remove(this);
 		Destroy(gameObject);
+
+		if(deathEffect) ObjectPoolController.Instantiate(deathEffect, transform.position, deathEffect.transform.rotation);
 	}
 
 	public void applyBias(float change)
 	{
+		if(Mathf.Abs(bias) > 0.99f && bias * change > 0f)
+			_influencedTime += 2f * Time.deltaTime;
+
 		bias += change;
 		bias = Mathf.Clamp(bias, -1f, 1f);
-
-		_influencedTime += 2f * Time.deltaTime;
 	}
 
 	void Update()
@@ -99,6 +118,15 @@ public class Entity : MonoBehaviour
 		_influencedTime = Mathf.Max(0, _influencedTime);
 		if(_influencedTime > 0.5f)
 			die();
+
+		//========================================//
+
+		const float dangerZone = 0.6f;
+
+		var size =  GameSession.inst.ground.localScale.x * 0.5f;
+		float danger = Mathf.Clamp01((Mathf.Abs(transform.position.x) - size * dangerZone) / (size * (1f-dangerZone)));
+		if(bias * transform.position.x > 0f) danger = 0f;
+		transform.localScale = Vector3.Lerp(_initialScale, _initialScale * 2.5f, danger);
 	}
 
 	int getGridIndex()
