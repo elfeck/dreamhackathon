@@ -7,6 +7,8 @@ public class Menu : MonoBehaviour
 
 	void OnGUI()
 	{
+		Screen.showCursor = true;
+
 		window.x = (Screen.width - window.width) * 0.5f;
 		window.y = (Screen.height - window.height) * 0.5f;
 

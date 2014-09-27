@@ -74,11 +74,11 @@ public class PlayerController : SASSingleton<PlayerController>
 
 		//========================================//
 
-		if(Input.GetKeyDown(KeyCode.Space))
-		{
-			//reset!
-			GameSession.inst.reset();
-		}
+		//if(Input.GetKeyDown(KeyCode.Space))
+		//{
+		//	//reset!
+		//	GameSession.inst.reset();
+		//}
 
 		//========================================//
 

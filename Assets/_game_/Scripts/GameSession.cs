@@ -92,6 +92,8 @@ public class GameSession : SASSingleton<GameSession>
 
 	void slowUpdate()
 	{
+		Screen.showCursor = false;
+
 		//check if an entity is in the final region of the opposing party
 		foreach(var e in Entity.allEntities)
 		{
