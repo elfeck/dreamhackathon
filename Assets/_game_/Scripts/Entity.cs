@@ -6,6 +6,7 @@ public class Entity : MonoBehaviour
 {
 	static private List<HashSet<Entity>> _grid;
 	static public List<Entity> allEntities = new List<Entity>();
+	static public int deathCount = 0;
 
 	static public void destroyAll()
 	{
@@ -97,6 +98,7 @@ public class Entity : MonoBehaviour
 	{
 		_grid[_currGridIndex].Remove(this);
 		Destroy(gameObject);
+		deathCount++;
 
 		if(deathEffect) ObjectPoolController.Instantiate(deathEffect, transform.position, deathEffect.transform.rotation);
 	}

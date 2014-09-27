@@ -27,6 +27,7 @@ public class GameSession : SASSingleton<GameSession>
 
 	public int getGridResolution() {return gridResolution;}
 	public void setSpawnBalance(float bal) { _currBalance = bal; }
+	public bool gameOver() { return allowGameOver && (redLifes <= 0 || blueLifes <= 0);}
 
 	public override void Awake()
 	{
@@ -129,5 +130,6 @@ public class GameSession : SASSingleton<GameSession>
 		redLifes = blueLifes = _initialLifes;
 
 		_startTime = Time.time;
+		Entity.deathCount = 0;
 	}
 }

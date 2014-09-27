@@ -87,5 +87,10 @@ public class PlayerController : SASSingleton<PlayerController>
 			Entity.destroyAll();
 			GameSession.inst.reset();
 		}
+
+		//========================================//
+
+		if(Input.GetKeyDown(KeyCode.Escape))
+			Application.LoadLevel("Menu");
 	}
 }
