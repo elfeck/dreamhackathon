@@ -5,9 +5,11 @@ public class TutorialController : MonoBehaviour
 {
 	IEnumerator Start ()
 	{
+		Time.timeScale = 1f;
 		PlayerController.inst.cursors = 0;
 		GameSession.inst.enableSpawnBalanceCurve = false;
 		GameSession.inst.spawnRate = 0f;
+		GameSession.inst.allowTimescaleChange = false;
 
 		yield return StartCoroutine(showTextCo("TUTORIAL", 1.5f));
 		yield return new WaitForSeconds(0.5f);
@@ -21,8 +23,6 @@ public class TutorialController : MonoBehaviour
 
 		PlayerController.inst.cursors = 1;
 		yield return StartCoroutine(showTextCo("But then you show up...", 1.5f, true));
-
-		yield return new WaitForSeconds(0.5f);
 		yield return StartCoroutine(showTextCo("... and change their loyalty! (MOVE the CURSOR over them)", 5f, true));
 
 		//========================================//
