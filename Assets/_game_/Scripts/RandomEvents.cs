@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class RandomEvents : MonoBehaviour {
 
-    [SerializeField] float eventDistribution;
+    [SerializeField] Vector2 eventDistribution;
     [SerializeField] bool speedUpEnabled;
     [SerializeField] Vector2 speedUpMultiplier;
     [SerializeField] Vector2 speedUpDuration;
@@ -16,7 +16,7 @@ public class RandomEvents : MonoBehaviour {
     [SerializeField] Vector2 colorBombRadius;
 
     float timer;
-    bool eventOngoing;
+    //bool eventOngoing;
     int[] sides = new int[] { -1, 1, 2 };
 
     List<IEnumerator> allEvents;
@@ -27,6 +27,8 @@ public class RandomEvents : MonoBehaviour {
         {
             SpeedUp(sides[Random.Range(0, sides.Length)]),
             SpawnRateUp(),
+            ColorBomb(),
+            ColorBomb(),
             ColorBomb()
         };
     }
@@ -55,11 +57,12 @@ public class RandomEvents : MonoBehaviour {
 
         for (; ; )
         {
-            timer += Time.deltaTime * _updateFreq;
+            _timer += _updateFreq;
 
-            if (timer > eventDistribution)
+            if (_timer > Random.Range(eventDistribution.x, eventDistribution.y))
             {
                 StartCoroutine(allEvents[Random.Range(0, allEvents.Count)]);
+                _timer = 0;
             }
 
             yield return new WaitForSeconds(_updateFreq);
@@ -72,8 +75,6 @@ public class RandomEvents : MonoBehaviour {
     {
         if(speedUpEnabled)
         {
-            eventOngoing = true;
-
             timer = 0;
             float _duration = Random.Range(speedUpDuration.x, speedUpDuration.y);
             float _speed = Random.Range(speedUpMultiplier.x, speedUpMultiplier.y);
@@ -111,16 +112,12 @@ public class RandomEvents : MonoBehaviour {
             {
                 _ent.movement.speed /= _speed;
             }
-
-            eventOngoing = false;   
         }
     }
     IEnumerator SpawnRateUp()
     {
         if(spawnRateEnabled)
         {
-            eventOngoing = true;
-
             timer = 0;
             float _duration = Random.Range(spawnRateDuration.x, spawnRateDuration.y);
             float _multiplier = Random.Range(spawnRateMultiplier.x, spawnRateMultiplier.y);
@@ -134,8 +131,6 @@ public class RandomEvents : MonoBehaviour {
             }
 
             GameSession.inst.spawnRate /= _multiplier;
-
-            eventOngoing = false;
         } 
     }
     /// <param name="_sideToBecome">Has to be -1 or 1.</param>
@@ -143,8 +138,6 @@ public class RandomEvents : MonoBehaviour {
     {
         if(colorBombEnabled)
         {
-            eventOngoing = true;
-
             float _radius = Random.Range(colorBombRadius.x, colorBombRadius.y);
 
             GameObject _ground = GameObject.Find("obj_Ground");
@@ -166,7 +159,6 @@ public class RandomEvents : MonoBehaviour {
             //Play particle system
             if (colorBombEffect) ObjectPoolController.Instantiate(colorBombEffect, new Vector3(_pos.x, _pos.y + 1, _pos.z), colorBombEffect.transform.rotation);
 
-            eventOngoing = false;
             yield return null;
         }
     }
