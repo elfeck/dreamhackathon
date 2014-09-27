@@ -92,22 +92,28 @@ public class GameSession : SASSingleton<GameSession>
 
 	//---------------------------------------------------------------------------//
 
+	public bool allowTimescaleChange = true;
+
 	void Update()
 	{
-		if(gameOver())
-			_currTimeScale = 0.001f;
-		else
+
+		if(allowTimescaleChange)
 		{
-			if(allowGameOver) _currTimeScale = 1f;
+			if(gameOver())
+				_currTimeScale = 0.001f;
 			else
 			{
-				if(_currTimeScale < 0.98f)
-					_currTimeScale = Mathf.Lerp(_currTimeScale, 1f, Time.deltaTime * 0.2f);
+				if(allowGameOver)
+				{
+					if(_currTimeScale < 0.98f)
+						_currTimeScale = Mathf.Lerp(_currTimeScale, 1f, 0.1f);
+					else _currTimeScale = 1f;
+				}
 				else _currTimeScale = 1f;
 			}
-		}
 
-		Time.timeScale = _currTimeScale;
+			Time.timeScale = _currTimeScale;
+		}		
 	}
 
 	void slowUpdate()
