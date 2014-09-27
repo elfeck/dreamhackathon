@@ -19,24 +19,10 @@ public class RandomEvents : MonoBehaviour {
     //bool eventOngoing;
     int[] sides = new int[] { -1, 1, 2 };
 
-    List<IEnumerator> allEvents;
-
-    void Awake()
-    {
-        allEvents = new List<IEnumerator>() 
-        {
-            SpeedUp(sides[Random.Range(0, sides.Length)]),
-            SpawnRateUp(),
-            ColorBomb(),
-            ColorBomb(),
-            ColorBomb()
-        };
-    }
-
 	// Use this for initialization
 	void Start () 
     {
-        StartCoroutine(PickEvent(5f));
+        StartCoroutine(PickEvent());
 	}
 	
 	// Update is called once per frame
@@ -51,21 +37,30 @@ public class RandomEvents : MonoBehaviour {
             StartCoroutine(ColorBomb());
 	}
 
-    IEnumerator PickEvent(float _updateFreq)
+    IEnumerator PickEvent()
     {
-        float _timer = 0;
+        float _eventTimer = 0;
 
         for (; ; )
         {
-            _timer += _updateFreq;
+            _eventTimer += Time.deltaTime;
 
-            if (_timer > Random.Range(eventDistribution.x, eventDistribution.y))
+            if (_eventTimer > Random.Range(eventDistribution.x, eventDistribution.y))
             {
-                StartCoroutine(allEvents[Random.Range(0, allEvents.Count)]);
-                _timer = 0;
+                int _rnd = Random.Range(0, 101);
+
+                if (_rnd <= 25)
+                { 
+                    if(speedUpEnabled) StartCoroutine(SpeedUp(sides[Random.Range(0, sides.Length)]));
+                    else if (spawnRateEnabled) StartCoroutine(SpawnRateUp());
+                }
+                else if (_rnd <= 50 && spawnRateEnabled) StartCoroutine(SpawnRateUp());
+                else if (colorBombEnabled) StartCoroutine(ColorBomb());
+
+                _eventTimer = 0;
             }
 
-            yield return new WaitForSeconds(_updateFreq);
+            yield return null;
         }
     }
 
@@ -73,6 +68,9 @@ public class RandomEvents : MonoBehaviour {
     /// <param name="_sideToAffect">Has to be -1, 1 or 2. 2 means "both sides"</param>
     IEnumerator SpeedUp(int _sideToAffect)
     {
+        Debug.Log("event!");
+
+
         if(speedUpEnabled)
         {
             timer = 0;
@@ -136,6 +134,8 @@ public class RandomEvents : MonoBehaviour {
     /// <param name="_sideToBecome">Has to be -1 or 1.</param>
     IEnumerator ColorBomb()
     {
+        Debug.Log("event!");
+
         if(colorBombEnabled)
         {
             float _radius = Random.Range(colorBombRadius.x, colorBombRadius.y);
