@@ -37,13 +37,13 @@ public class RandomEvents : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	    if(Input.GetKeyDown(KeyCode.Space))
+	    if(Input.GetKeyDown(KeyCode.Alpha7))
             StartCoroutine(SpeedUp(sides[Random.Range(0, sides.Length)]));
 
-        if (Input.GetKeyDown(KeyCode.U))
+        if (Input.GetKeyDown(KeyCode.Alpha8))
             StartCoroutine(SpawnRateUp());
 
-        if (Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.Alpha9))
             StartCoroutine(ColorBomb());
 	}
 
